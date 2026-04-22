@@ -1,3 +1,0 @@
-Descripción de la Lógica: el sistema centraliza las operaciones en la tabla NOTA_VENTA, la cual actúa como apoyo relacionando a los clientes con los vendedores y el detalle de los artículos vendidos, la integridad referencial se mantiene mediante el uso de llaves foráneas que conectan el inventario con cada transacción
-
-Módulo Dinámico: se incluye una relación específica para el área de Fast Food, permitiendo que un producto final se descomponga en múltiples ingredientes facilitando el control de stock automatizado
