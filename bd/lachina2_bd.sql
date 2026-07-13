@@ -89,19 +89,44 @@ CREATE TABLE `usuario_web` (
   `ultimo` time DEFAULT NULL,
   `ip` varchar(20) DEFAULT NULL,
   `ip_fecha` date DEFAULT NULL,
-  `ip_hora` time DEFAULT NULL
+  `ip_hora` time DEFAULT NULL,
+  `ultimo_acceso` datetime DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
 -- Volcado de datos para la tabla `usuario_web`
 --
 
-INSERT INTO `usuario_web` (`id_usuario`, `usuario`, `clave`, `nivel`, `estatus`, `nombreyapellido`, `correo`, `tipo`, `ultimo`, `ip`, `ip_fecha`, `ip_hora`) VALUES
-(1, 'jazpaczl@hotmail.com', '4321', 1, NULL, 'Javier Zabala', 'jazpaczl@hotmail.com', NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `usuario_web` (`id_usuario`, `usuario`, `clave`, `nivel`, `estatus`, `nombreyapellido`, `correo`, `tipo`, `ultimo`, `ip`, `ip_fecha`, `ip_hora`, `ultimo_acceso`) VALUES
+(1, 'jazpaczl@hotmail.com', '4321', 1, NULL, 'Javier Zabala', 'jazpaczl@hotmail.com', NULL, NULL, NULL, NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `historial_conexiones`
+--
+
+CREATE TABLE `historial_conexiones` (
+  `id` int(11) NOT NULL,
+  `usuario` varchar(100) NOT NULL,
+  `nombreyapellido` varchar(100) DEFAULT NULL,
+  `nivel` int(11) NOT NULL,
+  `fecha_hora` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `ip` varchar(45) DEFAULT NULL,
+  `estado` varchar(50) DEFAULT 'Exitoso'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Índices para tablas volcadas
 --
+
+--
+-- Indices de la tabla `historial_conexiones`
+--
+ALTER TABLE `historial_conexiones`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `usuario` (`usuario`),
+  ADD KEY `fecha_hora` (`fecha_hora`);
 
 --
 -- Indices de la tabla `suscripcion`
@@ -131,6 +156,12 @@ ALTER TABLE `usuario_web`
 --
 -- AUTO_INCREMENT de las tablas volcadas
 --
+
+--
+-- AUTO_INCREMENT de la tabla `historial_conexiones`
+--
+ALTER TABLE `historial_conexiones`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `suscripcion`

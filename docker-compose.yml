@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Servicio de Base de Datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: lachina_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: secret_root_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      # Script de inicialización de las bases de datos
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
+      # Carpeta que contiene los archivos SQL de respaldo para que la inicialización los lea
+      - ./bd:/sql-dumps:ro
+    networks:
+      - lachina_network
+
+  # Servicio de la aplicación web PHP + Apache
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lachina_web
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      - DB_HOST=db
+      - DB_USER=root_mundo
+      - DB_PASS=D2wZP8WhX_PyNAKc*
+    volumes:
+      # Montar la carpeta lachina2 en caliente para desarrollo local en vivo
+      - ./lachina2:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - lachina_network
+
+volumes:
+  db_data:
+
+networks:
+  lachina_network:
+    driver: bridge

@@ -1,4 +1,4 @@
-<?php require_once('../Connections/produccion.php'); ?>
+<?php require_once('../Connections/md_connect.php'); ?>
 <?php
 
 function buscaTexto($texto) {

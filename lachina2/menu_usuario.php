@@ -3,6 +3,8 @@
 if (!isset($_SESSION)) {
   session_start();
 }
+require_once('funciones/track_activity.php');
+
 $logoutAction = $_SERVER['PHP_SELF']."?doLogout=true";
 if ((isset($_SERVER['QUERY_STRING'])) && ($_SERVER['QUERY_STRING'] != "")){
   $logoutAction .="&". htmlentities($_SERVER['QUERY_STRING']);
@@ -22,7 +24,7 @@ if ((isset($_GET['doLogout'])) &&($_GET['doLogout']=="true")){
 	  }
 }
 
-$MM_authorizedUsers = "1";
+$MM_authorizedUsers = "1,2,3";
 $MM_donotCheckaccess = "false";
 
 function isAuthorized($strUsers, $strGroups, $UserName, $UserGroup) { 
@@ -89,7 +91,10 @@ $mfecha=date("Y-m-d");
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i><?php echo $_SESSION['MM_Username']; ?></a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                        <?php if (isset($_SESSION['MM_UserGroup']) && ($_SESSION['MM_UserGroup'] == 2 || $_SESSION['MM_UserGroup'] == 3)): ?>
+                        <li><a class="dropdown-item" href="dashboard.php"><i class="fas fa-tachometer-alt fa-sm fa-fw me-2"></i>Panel de Control</a></li>
                         <li><hr class="dropdown-divider" /></li>
+                        <?php endif; ?>
                         <li><a class="dropdown-item" href="<?php echo $logoutAction ?>">Logout</a></li>
                     </ul>
                 </li>

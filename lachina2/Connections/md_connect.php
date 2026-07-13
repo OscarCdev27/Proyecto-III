@@ -5,21 +5,25 @@ function mysqli_result($result, $iRow, $field = 0) {
  if(!array_key_exists($field, $row)) return false; 
 return $row[$field]; 
 } 
-$hostname_mundo = "localhost";
+$db_host = getenv('DB_HOST') ?: 'localhost';
+$db_user = getenv('DB_USER') ?: 'root_mundo';
+$db_pass = getenv('DB_PASS') !== false ? getenv('DB_PASS') : 'D2wZP8WhX_PyNAKc*';
+
+$hostname_mundo = $db_host;
 $database_mundo = "tucasa_bd";
-$username_mundo = "root_mundo";
-$password_mundo = "D2wZP8WhX_PyNAKc*";
+$username_mundo = $db_user;
+$password_mundo = $db_pass;
 $mundo_connect = mysqli_connect($hostname_mundo,$username_mundo,$password_mundo,$database_mundo);
 
-$hostname_webshop = "localhost";
+$hostname_webshop = $db_host;
 $database_webshop = "sainvc30_bd";
-$username_webshop = "root_mundo";
-$password_webshop = "D2wZP8WhX_PyNAKc*";
+$username_webshop = $db_user;
+$password_webshop = $db_pass;
 $webshop_connect = mysqli_connect($hostname_webshop,$username_webshop,$password_webshop,$database_webshop);
 
-$hostname_china = "localhost";
+$hostname_china = $db_host;
 $database_china = "lachina2_bd";
-$username_china = "root_mundo";
-$password_china = "D2wZP8WhX_PyNAKc*";
+$username_china = $db_user;
+$password_china = $db_pass;
 $china_connect = mysqli_connect($hostname_china,$username_china,$password_china,$database_china);
 ?>
