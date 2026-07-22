@@ -66,7 +66,7 @@
             background-color: var(--container-bg);
             border: 1px solid #1e293b;
             border-radius: 18px;
-            padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+            padding: 3.2rem 1.5rem 1.5rem 1.5rem;
             max-width: 1450px;
             width: 100%;
             position: relative;
@@ -92,7 +92,7 @@
             align-items: start;
             position: relative;
             z-index: 1;
-            margin-top: 1rem;
+            margin-top: 0.5rem;
         }
 
         @media (max-width: 1100px) {
@@ -778,10 +778,10 @@
                     let labelY = (y1 + y2) / 2;
 
                     if (conn.arcTop) {
-                        // Arc high over the cards to avoid crossing middle card!
-                        const arcY = Math.min(y1, y2) - 55;
-                        pathData = `M ${x1} ${y1} C ${x1 + 40} ${arcY}, ${x2 - 40} ${arcY}, ${x2} ${y2}`;
-                        labelY = arcY + 12;
+                        // High arc way above cards so it doesn't touch middle card at all
+                        const arcY = Math.min(y1, y2) - 85;
+                        pathData = `M ${x1} ${y1} C ${x1 + 50} ${arcY}, ${x2 - 50} ${arcY}, ${x2} ${y2}`;
+                        labelY = arcY + 14;
                     } else {
                         // Smooth direct curve
                         const dx = Math.abs(x2 - x1) * 0.45;
