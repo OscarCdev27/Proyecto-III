@@ -12,13 +12,14 @@ if($loginUsername!="" AND $password!=""){
   $MM_redirectLoginFailed = "401.html";
   $MM_redirecttoReferrer = false;
   
-  $LoginRS__query="SELECT usuario, clave, nivel, nombreyapellido FROM usuario_web WHERE usuario='$loginUsername' AND clave='$password'"; 
+  $LoginRS__query="SELECT usuario, clave, nivel, nombreyapellido FROM usuario_web WHERE (usuario='$loginUsername' OR correo='$loginUsername') AND clave='$password'"; 
   $LoginRS = mysqli_query($china_connect,$LoginRS__query)  or die(mysqli_error($china_connect));
   $row_LoginRS = mysqli_fetch_array($LoginRS);
   $totalRows_LoginRS = mysqli_num_rows($LoginRS);  
   
   if ($totalRows_LoginRS==1) {
-        $datosv_query="SELECT usuario, estatus FROM suscripcion WHERE usuario='$loginUsername'"; 
+        $realDbUsername = $row_LoginRS['usuario']; // El usuario real de la DB (no el correo ingresado en el input)
+        $datosv_query="SELECT usuario, estatus FROM suscripcion WHERE usuario='$realDbUsername'"; 
         $datosv= mysqli_query($china_connect,$datosv_query)  or die(mysqli_error($china_connect));
         $row_datosv = mysqli_fetch_array($datosv);
 		$estado = $row_datosv ? (int)$row_datosv["estatus"] : 0;
@@ -26,14 +27,14 @@ if($loginUsername!="" AND $password!=""){
 	    if($estado==1){
 			$loginStrGroup  = $row_LoginRS["nivel"];
 			if (PHP_VERSION >= 5.1) {session_regenerate_id(true);} else {session_regenerate_id();}
-			$_SESSION['MM_Username'] = $loginUsername;
+			$_SESSION['MM_Username'] = $realDbUsername;
 			$_SESSION['MM_UserGroup'] = $loginStrGroup;	      
 			
 			// Registrar acceso exitoso y actualizar estado
 			$ip = $_SERVER['REMOTE_ADDR'];
 			$fecha = date("Y-m-d");
 			$hora = date("H:i:s");
-			$user_clean = mysqli_real_escape_string($china_connect, $loginUsername);
+			$user_clean = mysqli_real_escape_string($china_connect, $realDbUsername);
 			$nombre_clean = mysqli_real_escape_string($china_connect, $row_LoginRS['nombreyapellido']);
 			$nivel = intval($row_LoginRS['nivel']);
 			
@@ -42,17 +43,17 @@ if($loginUsername!="" AND $password!=""){
 			
     		print("<script>window.location.replace('$MM_redirectLoginSuccess');</script>");
 		}else{
-     	    if($estado!=3){
+      	    if($estado!=3){
 				$loginStrGroup  = $row_LoginRS["nivel"];
 				if (PHP_VERSION >= 5.1) {session_regenerate_id(true);} else {session_regenerate_id();}
-				$_SESSION['MM_Username'] = $loginUsername;
+				$_SESSION['MM_Username'] = $realDbUsername;
 				$_SESSION['MM_UserGroup'] = $loginStrGroup;	      
 				
 				// Registrar acceso exitoso y actualizar estado
 				$ip = $_SERVER['REMOTE_ADDR'];
 				$fecha = date("Y-m-d");
 				$hora = date("H:i:s");
-				$user_clean = mysqli_real_escape_string($china_connect, $loginUsername);
+				$user_clean = mysqli_real_escape_string($china_connect, $realDbUsername);
 				$nombre_clean = mysqli_real_escape_string($china_connect, $row_LoginRS['nombreyapellido']);
 				$nivel = intval($row_LoginRS['nivel']);
 				
@@ -63,7 +64,7 @@ if($loginUsername!="" AND $password!=""){
 			}else{
 				// Registrar acceso fallido por bloqueo
 				$ip = $_SERVER['REMOTE_ADDR'];
-				$user_clean = mysqli_real_escape_string($china_connect, $loginUsername);
+				$user_clean = mysqli_real_escape_string($china_connect, $realDbUsername);
 				$nombre_clean = mysqli_real_escape_string($china_connect, $row_LoginRS['nombreyapellido']);
 				$nivel = intval($row_LoginRS['nivel']);
 				mysqli_query($china_connect, "INSERT INTO historial_conexiones (usuario, nombreyapellido, nivel, ip, estado) VALUES ('$user_clean', '$nombre_clean', $nivel, '$ip', 'Fallido (Usuario Bloqueado)')");

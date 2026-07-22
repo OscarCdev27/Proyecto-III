@@ -19,9 +19,26 @@ require_once('funciones/track_activity.php');
 $real_username = $_SESSION['MM_Username'];
 $real_group = intval($_SESSION['MM_UserGroup']);
 
-// Permitir simulación de roles a administradores y programadores (para testing conveniente)
+// Verificar si el usuario aún existe en la base de datos (por si se reinició la DB o se eliminó el usuario)
+$check_user_exists = mysqli_query($china_connect, "SELECT 1 FROM usuario_web WHERE usuario='" . mysqli_real_escape_string($china_connect, $real_username) . "'");
+if (!$check_user_exists || mysqli_num_rows($check_user_exists) == 0) {
+    // Limpiar sesión y redirigir a login
+    $_SESSION = array();
+    if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+            $params["path"], $params["domain"],
+            $params["secure"], $params["httponly"]
+        );
+    }
+    session_destroy();
+    header("Location: login.html");
+    exit;
+}
+
+// Permitir simulación de roles a administradores (para testing conveniente)
 $effective_group = $real_group;
-if (($real_group == 2 || $real_group == 3) && isset($_GET['view_as'])) {
+if ($real_group == 3 && isset($_GET['view_as'])) {
     $requested_view = intval($_GET['view_as']);
     if ($requested_view >= 1 && $requested_view <= 3) {
         $effective_group = $requested_view;
@@ -32,37 +49,42 @@ if (($real_group == 2 || $real_group == 3) && isset($_GET['view_as'])) {
 $msg_success = "";
 $msg_error = "";
 
-// 2. Procesar Acciones de Administración (CRUD) si el rol efectivo o real es Administrador
-if ($real_group == 3) {
+// 2. Procesar Acciones de Administración (CRUD) si el rol efectivo o real es Administrador o Programador
+if ($real_group == 3 || $real_group == 2) {
     // A. CREAR USUARIO
     if (isset($_POST['action']) && $_POST['action'] == 'create') {
-        $new_usuario = mysqli_real_escape_string($china_connect, $_POST['usuario']);
-        $new_clave = mysqli_real_escape_string($china_connect, $_POST['clave']);
-        $new_nombre = mysqli_real_escape_string($china_connect, $_POST['nombreyapellido']);
-        $new_nivel = intval($_POST['nivel']);
-        $new_status = intval($_POST['estatus'] ?? 1); // 1 = activo, 3 = bloqueado
-
-        if (empty($new_usuario) || empty($new_clave) || empty($new_nombre)) {
-            $msg_error = "Todos los campos son requeridos.";
+        if ($real_group != 3) {
+            $msg_error = "No tienes permisos para registrar nuevos usuarios.";
         } else {
-            // Verificar duplicados
-            $chk = mysqli_query($china_connect, "SELECT id_usuario FROM usuario_web WHERE usuario='$new_usuario'");
-            if (mysqli_num_rows($chk) == 0) {
-                // Insertar en usuario_web
-                $q1 = mysqli_query($china_connect, "INSERT INTO usuario_web (usuario, clave, nivel, nombreyapellido, correo, estatus) VALUES ('$new_usuario', '$new_clave', $new_nivel, '$new_nombre', '$new_usuario', $new_status)");
-                
-                // Insertar en suscripcion
-                $fecha = date("Y-m-d");
-                $hora = date("H:i:s");
-                $q2 = mysqli_query($china_connect, "INSERT INTO suscripcion (correo, nombre, estatus, usuario, fecha, hora, tipo) VALUES ('$new_usuario', '$new_nombre', $new_status, '$new_usuario', '$fecha', '$hora', 0)");
-                
-                if ($q1 && $q2) {
-                    $msg_success = "Usuario '$new_usuario' creado con éxito.";
-                } else {
-                    $msg_error = "Error al insertar en la base de datos: " . mysqli_error($china_connect);
-                }
+            $new_usuario = mysqli_real_escape_string($china_connect, $_POST['usuario']);
+            $new_correo = mysqli_real_escape_string($china_connect, $_POST['correo']);
+            $new_clave = mysqli_real_escape_string($china_connect, $_POST['clave']);
+            $new_nombre = mysqli_real_escape_string($china_connect, $_POST['nombreyapellido']);
+            $new_nivel = intval($_POST['nivel']);
+            $new_status = intval($_POST['estatus'] ?? 1); // 1 = activo, 3 = bloqueado
+
+            if (empty($new_usuario) || empty($new_clave) || empty($new_nombre)) {
+                $msg_error = "Todos los campos obligatorios (Usuario, Contraseña y Nombre) son requeridos.";
             } else {
-                $msg_error = "El correo/usuario ya se encuentra registrado.";
+                // Verificar duplicados en usuario o correo (si se ingresó)
+                $chk = mysqli_query($china_connect, "SELECT id_usuario FROM usuario_web WHERE usuario='$new_usuario'" . ($new_correo != "" ? " OR correo='$new_correo'" : ""));
+                if (mysqli_num_rows($chk) == 0) {
+                    // Insertar en usuario_web
+                    $q1 = mysqli_query($china_connect, "INSERT INTO usuario_web (usuario, clave, nivel, nombreyapellido, correo, estatus) VALUES ('$new_usuario', '$new_clave', $new_nivel, '$new_nombre', '$new_correo', $new_status)");
+                    
+                    // Insertar en suscripcion
+                    $fecha = date("Y-m-d");
+                    $hora = date("H:i:s");
+                    $q2 = mysqli_query($china_connect, "INSERT INTO suscripcion (correo, nombre, estatus, usuario, fecha, hora, tipo) VALUES ('$new_correo', '$new_nombre', $new_status, '$new_usuario', '$fecha', '$hora', 0)");
+                    
+                    if ($q1 && $q2) {
+                        $msg_success = "Usuario '$new_usuario' creado con éxito.";
+                    } else {
+                        $msg_error = "Error al insertar en la base de datos: " . mysqli_error($china_connect);
+                    }
+                } else {
+                    $msg_error = "El usuario o correo ya se encuentra registrado.";
+                }
             }
         }
     }
@@ -70,68 +92,94 @@ if ($real_group == 3) {
     // B. EDITAR USUARIO
     if (isset($_POST['action']) && $_POST['action'] == 'edit') {
         $id_usuario = intval($_POST['id_usuario']);
-        $edit_usuario = mysqli_real_escape_string($china_connect, $_POST['usuario']);
-        $edit_clave = mysqli_real_escape_string($china_connect, $_POST['clave']);
-        $edit_nombre = mysqli_real_escape_string($china_connect, $_POST['nombreyapellido']);
-        $edit_nivel = intval($_POST['nivel']);
-        $edit_estatus = intval($_POST['estatus']); // 1 = activo, 3 = bloqueado
+        
+        $is_valid_operation = true;
+        // Si el rol es Programador, solo se pueden editar usuarios de nivel 1 (Usuario Regular)
+        if ($real_group == 2) {
+            $chk_role = mysqli_query($china_connect, "SELECT nivel FROM usuario_web WHERE id_usuario = $id_usuario");
+            $row_role = mysqli_fetch_array($chk_role);
+            if (!$row_role || intval($row_role['nivel']) != 1) {
+                $msg_error = "No tienes permisos para modificar este usuario (solo puedes modificar usuarios regulares).";
+                $is_valid_operation = false;
+            }
+        }
 
-        if (empty($edit_usuario) || empty($edit_nombre) || empty($edit_clave)) {
-            $msg_error = "El correo, la clave y el nombre completo son obligatorios.";
-        } else {
-            // Obtener el nombre de usuario anterior
-            $orig_res = mysqli_query($china_connect, "SELECT usuario FROM usuario_web WHERE id_usuario = $id_usuario");
-            $orig_row = mysqli_fetch_array($orig_res);
-            if ($orig_row) {
-                $orig_user = $orig_row['usuario'];
+        if ($is_valid_operation) {
+            $edit_usuario = mysqli_real_escape_string($china_connect, $_POST['usuario']);
+            $edit_correo = mysqli_real_escape_string($china_connect, $_POST['correo']);
+            $edit_clave = mysqli_real_escape_string($china_connect, $_POST['clave']);
+            $edit_nombre = mysqli_real_escape_string($china_connect, $_POST['nombreyapellido']);
+            // Si el rol es Programador, forzar que el nivel siga siendo 1.
+            $edit_nivel = ($real_group == 2) ? 1 : intval($_POST['nivel']);
+            $edit_estatus = intval($_POST['estatus']); // 1 = activo, 3 = bloqueado
 
-                // Actualizar usuario_web
-                $q1 = mysqli_query($china_connect, "UPDATE usuario_web SET usuario='$edit_usuario', clave='$edit_clave', nivel=$edit_nivel, nombreyapellido='$edit_nombre', correo='$edit_usuario', estatus=$edit_estatus WHERE id_usuario = $id_usuario");
-                
-                // Actualizar suscripción
-                $sub_chk = mysqli_query($china_connect, "SELECT id_suscripcion FROM suscripcion WHERE usuario='$orig_user'");
-                if (mysqli_num_rows($sub_chk) > 0) {
-                    $q2 = mysqli_query($china_connect, "UPDATE suscripcion SET usuario='$edit_usuario', correo='$edit_usuario', nombre='$edit_nombre', estatus=$edit_estatus WHERE usuario='$orig_user'");
-                } else {
-                    $fecha = date("Y-m-d");
-                    $hora = date("H:i:s");
-                    $q2 = mysqli_query($china_connect, "INSERT INTO suscripcion (correo, nombre, estatus, usuario, fecha, hora, tipo) VALUES ('$edit_usuario', '$edit_nombre', $edit_estatus, '$edit_usuario', '$fecha', '$hora', 0)");
-                }
-
-                if ($q1 && $q2) {
-                    $msg_success = "Usuario actualizado correctamente.";
-                } else {
-                    $msg_error = "Error al actualizar en la base de datos: " . mysqli_error($china_connect);
-                }
+            if (empty($edit_usuario) || empty($edit_nombre) || empty($edit_clave)) {
+                $msg_error = "El usuario, la clave y el nombre completo son obligatorios.";
             } else {
-                $msg_error = "Usuario no encontrado.";
+                // Obtener el nombre de usuario anterior
+                $orig_res = mysqli_query($china_connect, "SELECT usuario FROM usuario_web WHERE id_usuario = $id_usuario");
+                $orig_row = mysqli_fetch_array($orig_res);
+                if ($orig_row) {
+                    $orig_user = $orig_row['usuario'];
+
+                    // Verificar duplicados en otro registro (si se ingresó el correo)
+                    $chk_dup = mysqli_query($china_connect, "SELECT id_usuario FROM usuario_web WHERE (usuario='$edit_usuario'" . ($edit_correo != "" ? " OR correo='$edit_correo'" : "") . ") AND id_usuario != $id_usuario");
+                    if (mysqli_num_rows($chk_dup) > 0) {
+                        $msg_error = "El usuario o correo ya se encuentra registrado por otra cuenta.";
+                    } else {
+                        // Actualizar usuario_web
+                        $q1 = mysqli_query($china_connect, "UPDATE usuario_web SET usuario='$edit_usuario', clave='$edit_clave', nivel=$edit_nivel, nombreyapellido='$edit_nombre', correo='$edit_correo', estatus=$edit_estatus WHERE id_usuario = $id_usuario");
+                        
+                        // Actualizar suscripción
+                        $sub_chk = mysqli_query($china_connect, "SELECT id_suscripcion FROM suscripcion WHERE usuario='$orig_user'");
+                        if (mysqli_num_rows($sub_chk) > 0) {
+                            $q2 = mysqli_query($china_connect, "UPDATE suscripcion SET usuario='$edit_usuario', correo='$edit_correo', nombre='$edit_nombre', estatus=$edit_estatus WHERE usuario='$orig_user'");
+                        } else {
+                            $fecha = date("Y-m-d");
+                            $hora = date("H:i:s");
+                            $q2 = mysqli_query($china_connect, "INSERT INTO suscripcion (correo, nombre, estatus, usuario, fecha, hora, tipo) VALUES ('$edit_correo', '$edit_nombre', $edit_estatus, '$edit_usuario', '$fecha', '$hora', 0)");
+                        }
+
+                        if ($q1 && $q2) {
+                            $msg_success = "Usuario actualizado correctamente.";
+                        } else {
+                            $msg_error = "Error al actualizar en la base de datos: " . mysqli_error($china_connect);
+                        }
+                    }
+                } else {
+                    $msg_error = "Usuario no encontrado.";
+                }
             }
         }
     }
 
     // C. ELIMINAR USUARIO
     if (isset($_POST['action']) && $_POST['action'] == 'delete') {
-        $id_usuario = intval($_POST['id_usuario']);
-        $orig_res = mysqli_query($china_connect, "SELECT usuario FROM usuario_web WHERE id_usuario = $id_usuario");
-        $orig_row = mysqli_fetch_array($orig_res);
-        if ($orig_row) {
-            $orig_user = $orig_row['usuario'];
-            
-            // No permitir auto-eliminarse
-            if ($orig_user == $real_username) {
-                $msg_error = "No puedes eliminar tu propio usuario administrador.";
-            } else {
-                $q1 = mysqli_query($china_connect, "DELETE FROM usuario_web WHERE id_usuario = $id_usuario");
-                $q2 = mysqli_query($china_connect, "DELETE FROM suscripcion WHERE usuario = '$orig_user'");
-                
-                if ($q1 && $q2) {
-                    $msg_success = "Usuario '$orig_user' eliminado con éxito.";
-                } else {
-                    $msg_error = "Error al eliminar: " . mysqli_error($china_connect);
-                }
-            }
+        if ($real_group != 3) {
+            $msg_error = "No tienes permisos para eliminar usuarios.";
         } else {
-            $msg_error = "Usuario no encontrado.";
+            $id_usuario = intval($_POST['id_usuario']);
+            $orig_res = mysqli_query($china_connect, "SELECT usuario FROM usuario_web WHERE id_usuario = $id_usuario");
+            $orig_row = mysqli_fetch_array($orig_res);
+            if ($orig_row) {
+                $orig_user = $orig_row['usuario'];
+                
+                // No permitir auto-eliminarse
+                if ($orig_user == $real_username) {
+                    $msg_error = "No puedes eliminar tu propio usuario administrador.";
+                } else {
+                    $q1 = mysqli_query($china_connect, "DELETE FROM usuario_web WHERE id_usuario = $id_usuario");
+                    $q2 = mysqli_query($china_connect, "DELETE FROM suscripcion WHERE usuario = '$orig_user'");
+                    
+                    if ($q1 && $q2) {
+                        $msg_success = "Usuario '$orig_user' eliminado con éxito.";
+                    } else {
+                        $msg_error = "Error al eliminar: " . mysqli_error($china_connect);
+                    }
+                }
+            } else {
+                $msg_error = "Usuario no encontrado.";
+            }
         }
     }
 }
@@ -946,8 +994,8 @@ $user_logs_res = mysqli_query($china_connect, "SELECT * FROM historial_conexione
 
     <div class="dashboard-container">
 
-        <!-- Barra de Simulación para Testing (Solo disponible si el rol REAL es Administrador o Programador) -->
-        <?php if ($real_group == 2 || $real_group == 3): ?>
+        <!-- Barra de Simulación para Testing (Solo disponible si el rol REAL es Administrador) -->
+        <?php if ($real_group == 3): ?>
             <div class="testing-bar">
                 <div class="testing-title">
                     <i class="fa-solid fa-sliders"></i>
@@ -1104,6 +1152,7 @@ $user_logs_res = mysqli_query($china_connect, "SELECT * FROM historial_conexione
                                                         onclick="openEditModal(
                                                             '<?php echo $row['id_usuario']; ?>',
                                                             '<?php echo htmlspecialchars($row['usuario'], ENT_QUOTES); ?>',
+                                                            '<?php echo htmlspecialchars($row['correo'], ENT_QUOTES); ?>',
                                                             '<?php echo htmlspecialchars($row['clave'], ENT_QUOTES); ?>',
                                                             '<?php echo htmlspecialchars($row['nombreyapellido'], ENT_QUOTES); ?>',
                                                             '<?php echo $row['nivel']; ?>',
@@ -1330,6 +1379,106 @@ $user_logs_res = mysqli_query($china_connect, "SELECT * FROM historial_conexione
                     </div>
                 </div>
 
+                <!-- Panel de Gestión de Usuarios Regulares (Programador) -->
+                <div class="dashboard-card" style="grid-column: span 2;">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fa-solid fa-users-gear" style="color: var(--primary);"></i>
+                            Gestión de Usuarios Regulares (Clientes)
+                        </div>
+                        <div class="search-container">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="regularUserSearch" class="form-control" placeholder="Buscar usuario regular..." onkeyup="filterRegularUsers()">
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="regularUsersTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre Completo</th>
+                                    <th>Usuario</th>
+                                    <th>Correo</th>
+                                    <th>Estatus</th>
+                                    <th>Último Acceso</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                mysqli_data_seek($all_users_res, 0);
+                                $has_regular_users = false;
+                                while ($row_reg = mysqli_fetch_array($all_users_res)): 
+                                    $lvl = intval($row_reg['nivel']);
+                                    if ($lvl != 1) continue; // Solo mostrar usuarios regulares
+                                    $has_regular_users = true;
+                                    $status = intval($row_reg['suscripcion_estatus']);
+                                    
+                                    // Comprobar si está en línea (actividad en últimos 5 min)
+                                    $is_online = false;
+                                    if ($row_reg['ultimo_acceso']) {
+                                        $last_time = strtotime($row_reg['ultimo_acceso']);
+                                        $diff = time() - $last_time;
+                                        if ($diff <= 300) {
+                                            $is_online = true;
+                                        }
+                                    }
+                                ?>
+                                    <tr>
+                                        <td><?php echo $row_reg['id_usuario']; ?></td>
+                                        <td style="font-weight: 500;"><?php echo htmlspecialchars($row_reg['nombreyapellido']); ?></td>
+                                        <td><?php echo htmlspecialchars($row_reg['usuario']); ?></td>
+                                        <td><?php echo htmlspecialchars($row_reg['correo']); ?></td>
+                                        <td>
+                                            <?php if ($status == 3): ?>
+                                                <span class="tag-status tag-blocked">Bloqueado</span>
+                                            <?php else: ?>
+                                                <span class="tag-status tag-active">Activo</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <?php if ($is_online): ?>
+                                                    <span class="online-dot"><span class="online-dot-pulse"></span></span>
+                                                    <span style="font-size: 0.8rem; color: var(--success); font-weight: 500;">En línea</span>
+                                                <?php else: ?>
+                                                    <span class="offline-dot"></span>
+                                                    <span style="color: var(--text-muted); font-size: 0.8rem;">
+                                                        <?php echo $row_reg['ultimo_acceso'] ? date("d/m H:i", strtotime($row_reg['ultimo_acceso'])) : 'Nunca'; ?>
+                                                    </span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style="display: flex; gap: 6px;">
+                                                <button class="btn btn-secondary btn-sm" 
+                                                        onclick="openEditModal(
+                                                            '<?php echo $row_reg['id_usuario']; ?>',
+                                                            '<?php echo htmlspecialchars($row_reg['usuario'], ENT_QUOTES); ?>',
+                                                            '<?php echo htmlspecialchars($row_reg['correo'], ENT_QUOTES); ?>',
+                                                            '<?php echo htmlspecialchars($row_reg['clave'], ENT_QUOTES); ?>',
+                                                            '<?php echo htmlspecialchars($row_reg['nombreyapellido'], ENT_QUOTES); ?>',
+                                                            '1',
+                                                            '<?php echo ($status == 3) ? 3 : 1; ?>'
+                                                        )">
+                                                    <i class="fa-solid fa-pen-to-square"></i> Modificar / Bloquear
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                                <?php if (!$has_regular_users): ?>
+                                    <tr>
+                                        <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                            No hay usuarios regulares registrados.
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- Historial de Accesos Completo (Para auditoría del Programador) -->
                 <div class="dashboard-card" style="grid-column: span 2;">
                     <div class="card-header">
@@ -1515,9 +1664,15 @@ $user_logs_res = mysqli_query($china_connect, "SELECT * FROM historial_conexione
                     <input type="text" id="c_nombre" name="nombreyapellido" class="form-control" placeholder="Ej: Juan Pérez" required>
                 </div>
                 
-                <div class="form-group">
-                    <label for="c_usuario">Usuario / Correo Electrónico</label>
-                    <input type="email" id="c_usuario" name="usuario" class="form-control" placeholder="Ej: juan@gmail.com" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="c_usuario">Nombre de Usuario</label>
+                        <input type="text" id="c_usuario" name="usuario" class="form-control" placeholder="Ej: juan" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="c_correo">Correo Electrónico (Opcional)</label>
+                        <input type="email" id="c_correo" name="correo" class="form-control" placeholder="Ej: juan@gmail.com">
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -1569,9 +1724,15 @@ $user_logs_res = mysqli_query($china_connect, "SELECT * FROM historial_conexione
                     <input type="text" id="e_nombre" name="nombreyapellido" class="form-control" required>
                 </div>
                 
-                <div class="form-group">
-                    <label for="e_usuario">Usuario / Correo Electrónico</label>
-                    <input type="email" id="e_usuario" name="usuario" class="form-control" required>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="e_usuario">Nombre de Usuario</label>
+                        <input type="text" id="e_usuario" name="usuario" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="e_correo">Correo Electrónico (Opcional)</label>
+                        <input type="email" id="e_correo" name="correo" class="form-control">
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -1580,14 +1741,17 @@ $user_logs_res = mysqli_query($china_connect, "SELECT * FROM historial_conexione
                 </div>
 
                 <div class="form-row">
-                    <div class="form-group">
+                    <div class="form-group" <?php echo ($real_group == 2) ? 'style="display:none;"' : ''; ?>>
                         <label for="e_nivel">Rol / Nivel de Acceso</label>
-                        <select id="e_nivel" name="nivel" class="form-control" required>
+                        <select id="e_nivel" name="nivel" class="form-control" required <?php echo ($real_group == 2) ? 'disabled' : ''; ?>>
                             <option value="1">Usuario Regular</option>
                             <option value="2">Programador</option>
                             <option value="3">Administrador</option>
                         </select>
                     </div>
+                    <?php if ($real_group == 2): ?>
+                        <input type="hidden" name="nivel" value="1">
+                    <?php endif; ?>
                     
                     <div class="form-group">
                         <label for="e_estatus">Estado</label>
@@ -1635,9 +1799,10 @@ $user_logs_res = mysqli_query($china_connect, "SELECT * FROM historial_conexione
         }
 
         // 3. Modales de Edición
-        function openEditModal(id, usuario, clave, nombre, nivel, estatus) {
+        function openEditModal(id, usuario, correo, clave, nombre, nivel, estatus) {
             document.getElementById('e_id_usuario').value = id;
             document.getElementById('e_usuario').value = usuario;
+            document.getElementById('e_correo').value = correo;
             document.getElementById('e_clave').value = clave;
             document.getElementById('e_nombre').value = nombre;
             document.getElementById('e_nivel').value = nivel;
@@ -1717,6 +1882,29 @@ $user_logs_res = mysqli_query($china_connect, "SELECT * FROM historial_conexione
                 let show = false;
                 const tds = tr[i].getElementsByTagName("td");
                 for (let j = 0; j < tds.length; j++) {
+                    if (tds[j]) {
+                        const txtValue = tds[j].textContent || tds[j].innerText;
+                        if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                            show = true;
+                            break;
+                        }
+                    }
+                }
+                tr[i].style.display = show ? "" : "none";
+            }
+        }
+
+        // 7. Buscador en tiempo real de usuarios regulares (Programador)
+        function filterRegularUsers() {
+            const input = document.getElementById("regularUserSearch");
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById("regularUsersTable");
+            const tr = table.getElementsByTagName("tr");
+
+            for (let i = 1; i < tr.length; i++) {
+                let show = false;
+                const tds = tr[i].getElementsByTagName("td");
+                for (let j = 0; j < tds.length - 1; j++) {
                     if (tds[j]) {
                         const txtValue = tds[j].textContent || tds[j].innerText;
                         if (txtValue.toLowerCase().indexOf(filter) > -1) {

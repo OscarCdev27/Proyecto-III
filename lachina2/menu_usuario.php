@@ -45,6 +45,22 @@ function isAuthorized($strUsers, $strGroups, $UserName, $UserGroup) {
   return $isValid; 
 }
 
+// Verificar si el usuario de la sesión aún existe en la base de datos (por si se reinició la DB o se eliminó)
+if (isset($_SESSION['MM_Username'])) {
+    $check_user_exists = mysqli_query($china_connect, "SELECT 1 FROM usuario_web WHERE usuario='" . mysqli_real_escape_string($china_connect, $_SESSION['MM_Username']) . "'");
+    if (!$check_user_exists || mysqli_num_rows($check_user_exists) == 0) {
+        $_SESSION = array();
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $params["path"], $params["domain"],
+                $params["secure"], $params["httponly"]
+            );
+        }
+        session_destroy();
+    }
+}
+
 $MM_restrictGoTo = "401.html";
 if (!((isset($_SESSION['MM_Username'])) && (isAuthorized("",$MM_authorizedUsers, $_SESSION['MM_Username'], $_SESSION['MM_UserGroup'])))) {   
   $MM_qsChar = "?";
