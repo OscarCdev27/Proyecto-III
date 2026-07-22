@@ -26,4 +26,8 @@ $database_china = "lachina2_bd";
 $username_china = $db_user;
 $password_china = $db_pass;
 $china_connect = mysqli_connect($hostname_china,$username_china,$password_china,$database_china);
+
+if ($mundo_connect) mysqli_set_charset($mundo_connect, "utf8mb4");
+if ($webshop_connect) mysqli_set_charset($webshop_connect, "utf8mb4");
+if ($china_connect) mysqli_set_charset($china_connect, "utf8mb4");
 ?>

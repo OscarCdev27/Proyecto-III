@@ -148,7 +148,7 @@ CREATE TABLE `logros` (
   `runline2da2` varchar(10) DEFAULT NULL,
   `rl_puntos2da1` varchar(10) DEFAULT NULL,
   `rl_puntos2da2` varchar(10) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `logros`

@@ -40,7 +40,7 @@ CREATE TABLE `clientes` (
   `saldo_abono` decimal(14,2) DEFAULT NULL,
   `saldo_actual` decimal(14,2) DEFAULT NULL,
   `estatus` int(1) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `clientes`
@@ -67,7 +67,7 @@ CREATE TABLE `fastfood` (
   `impuesto` int(11) DEFAULT NULL,
   `estatus` int(1) DEFAULT NULL,
   `foto` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `fastfood`
@@ -205,7 +205,7 @@ CREATE TABLE `fastfood_ingredientes` (
   `precio` decimal(14,3) DEFAULT NULL,
   `neto_costo` decimal(14,3) DEFAULT NULL,
   `neto_precio` decimal(14,3) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `fastfood_ingredientes`
@@ -354,7 +354,7 @@ CREATE TABLE `inventario` (
   `precio_divisa` decimal(14,2) DEFAULT NULL,
   `estatus` int(1) DEFAULT NULL,
   `adicional` int(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `inventario`
@@ -529,7 +529,7 @@ CREATE TABLE `nota_venta` (
   `efectivo2` decimal(14,2) DEFAULT NULL,
   `efectivo3` decimal(14,2) DEFAULT NULL,
   `vuelto` decimal(14,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -548,7 +548,7 @@ CREATE TABLE `nota_venta_detalle` (
   `impuesto` int(11) NOT NULL,
   `estatus` int(11) NOT NULL,
   `costo_divisa` decimal(14,2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -569,7 +569,7 @@ CREATE TABLE `nota_venta_detalle_ingredientes` (
   `estatus` int(11) DEFAULT NULL,
   `d` int(1) DEFAULT NULL,
   `detalle2` varchar(40) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -588,7 +588,7 @@ CREATE TABLE `nota_venta_forma_pago` (
   `usuario` varchar(20) DEFAULT NULL,
   `estatus` int(1) DEFAULT NULL,
   `tipo_moneda` int(2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -605,7 +605,7 @@ CREATE TABLE `tabla_bancos` (
   `estatus` int(11) DEFAULT NULL,
   `correo` varchar(100) DEFAULT NULL,
   `detalle` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `tabla_bancos`
@@ -627,7 +627,7 @@ CREATE TABLE `tabla_departamentos` (
   `id_tabla_departamento` int(11) NOT NULL,
   `departamento` varchar(30) DEFAULT NULL,
   `clase` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `tabla_departamentos`
@@ -646,7 +646,7 @@ INSERT INTO `tabla_departamentos` (`id_tabla_departamento`, `departamento`, `cla
 CREATE TABLE `tabla_depositos` (
   `id_tabla_deposito` int(11) NOT NULL,
   `deposito` varchar(30) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `tabla_depositos`
@@ -667,7 +667,7 @@ CREATE TABLE `tabla_divisa` (
   `id_tabla_divisa` int(11) NOT NULL,
   `fecha` date NOT NULL,
   `tasa` decimal(14,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `tabla_divisa`
@@ -761,7 +761,7 @@ CREATE TABLE `tabla_empaques` (
   `sigla` varchar(3) DEFAULT NULL,
   `empaque` varchar(15) DEFAULT NULL,
   `cantidad` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -774,7 +774,7 @@ CREATE TABLE `tabla_referencias` (
   `referencia` varchar(30) DEFAULT NULL,
   `orden` int(11) DEFAULT NULL,
   `estatus` int(11) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `tabla_referencias`
@@ -817,7 +817,7 @@ CREATE TABLE `temporal_venta` (
   `usuario` varchar(20) DEFAULT NULL,
   `tasa_impuesto` decimal(14,2) DEFAULT NULL,
   `divisa` decimal(14,2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `temporal_venta`
@@ -847,7 +847,7 @@ CREATE TABLE `temporal_venta_detalle` (
   `estatus` int(11) DEFAULT NULL,
   `neto_costo` decimal(14,3) DEFAULT NULL,
   `neto_precio` decimal(14,3) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -870,7 +870,7 @@ CREATE TABLE `temporal_venta_detalle_ingredientes` (
   `d` int(1) NOT NULL DEFAULT 0,
   `combo` int(1) NOT NULL DEFAULT 0,
   `detalle2` varchar(40) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `temporal_venta_detalle_ingredientes`
@@ -907,7 +907,7 @@ CREATE TABLE `temporal_venta_inventario_detalle` (
   `i` int(1) NOT NULL DEFAULT 1,
   `a` int(1) NOT NULL DEFAULT 0,
   `c` int(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `temporal_venta_inventario_detalle`
@@ -949,7 +949,7 @@ CREATE TABLE `usuario` (
   `codigoseguro` varchar(20) DEFAULT NULL,
   `id_tabla_deposito` int(11) DEFAULT NULL,
   `id_vendedor` int(11) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `usuario`
@@ -976,7 +976,7 @@ CREATE TABLE `vendedores` (
   `correo` varchar(50) DEFAULT NULL,
   `comision` decimal(14,3) DEFAULT NULL,
   `estatus` int(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `vendedores`

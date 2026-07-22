@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama Entidad-Relación (DER) - La China Sports</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --container-bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --title-gold: #f59e0b;
+            
+            --badge-pk: #f97316;
+            --badge-fk: #3b82f6;
+            --badge-index: #06b6d4;
+            --badge-opt: #10b981;
+            --badge-none: #475569;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2.5rem 1.5rem;
+        }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            color: var(--title-gold);
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 0.4rem;
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            font-weight: 500;
+        }
+
+        /* MAIN CONTAINER */
+        .diagram-container {
+            background-color: var(--container-bg);
+            border: 1px solid #1e293b;
+            border-radius: 18px;
+            padding: 2rem;
+            max-width: 1400px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        /* GRID OF CARDS */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 1.75rem;
+            align-items: start;
+        }
+
+        /* CARD STYLE */
+        .table-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .table-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+        }
+
+        /* CARD HEADERS */
+        .card-header {
+            padding: 0.9rem 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .card-header .title-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-header .badge-tag {
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #ffffff;
+            text-transform: capitalize;
+        }
+
+        /* CARD VARIATIONS */
+        .card-blue .card-header {
+            background: linear-gradient(90deg, #0284c7 0%, #0369a1 100%);
+        }
+
+        .card-purple .card-header {
+            background: linear-gradient(90deg, #9333ea 0%, #7e22ce 100%);
+        }
+
+        .card-green .card-header {
+            background: linear-gradient(90deg, #059669 0%, #047857 100%);
+        }
+
+        .card-amber .card-header {
+            background: linear-gradient(90deg, #d97706 0%, #b45309 100%);
+        }
+
+        /* TABLE GRID INSIDE CARD */
+        .schema-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .schema-table th {
+            background-color: #0f172a;
+            color: var(--text-muted);
+            text-align: left;
+            padding: 0.6rem 0.9rem;
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .schema-table td {
+            padding: 0.65rem 0.9rem;
+            border-bottom: 1px solid #1e293b;
+            color: #cbd5e1;
+        }
+
+        .schema-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .schema-table tr:hover td {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        /* BADGES FOR KEYS */
+        .key-badge {
+            display: inline-block;
+            font-weight: 800;
+            font-size: 0.72rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #ffffff;
+            text-align: center;
+            min-width: 32px;
+        }
+
+        .key-pk { background-color: var(--badge-pk); }
+        .key-fk { background-color: var(--badge-fk); }
+        .key-index { background-color: var(--badge-index); }
+        .key-opt { background-color: var(--badge-opt); }
+        .key-none { color: #64748b; font-weight: 400; }
+
+        .field-name {
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .type-name {
+            color: #38bdf8;
+            font-family: monospace;
+            font-size: 0.82rem;
+        }
+
+        .restriction-text {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* TAB NAVIGATION */
+        .tab-nav {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .tab-btn {
+            background-color: #1e293b;
+            color: var(--text-muted);
+            border: 1px solid #334155;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background-color: var(--title-gold);
+            color: #000000;
+            border-color: var(--title-gold);
+        }
+
+        .db-section {
+            display: block;
+        }
+
+        .db-section.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>DIAGRAMA ENTIDAD-RELACIÓN (DER)</h1>
+        <p>Modelo de Datos Físico - Base de Datos lachina2_bd (Sistema Centro de Apuestas)</p>
+    </div>
+
+    <div class="diagram-container">
+
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchDb('lachina2', event)">Base de Datos: lachina2_bd</button>
+            <button class="tab-btn" onclick="switchDb('sainvc', event)">Base de Datos: sainvc30_bd</button>
+        </div>
+
+        <!-- SECTION 1: lachina2_bd -->
+        <div id="lachina2" class="db-section">
+            <div class="cards-grid">
+
+                <!-- TABLE: usuario_web -->
+                <div class="table-card card-blue">
+                    <div class="card-header">
+                        <div class="title-box">📋 usuario_web</div>
+                        <span class="badge-tag">Tabla Principal</span>
+                    </div>
+                    <table class="schema-table">
+                        <thead>
+                            <tr>
+                                <th>Clave</th>
+                                <th>Campo</th>
+                                <th>Tipo de Dato</th>
+                                <th>Detalle / Restricción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="key-badge key-pk">PK</span></td>
+                                <td class="field-name">id_usuario</td>
+                                <td class="type-name">INT</td>
+                                <td class="restriction-text">NOT NULL, AUTO_INC</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-badge key-index">INDEX</span></td>
+                                <td class="field-name">usuario</td>
+                                <td class="type-name">VARCHAR(50)</td>
+                                <td class="restriction-text">Unique Username</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">clave</td>
+                                <td class="type-name">VARCHAR(20)</td>
+                                <td class="restriction-text">Password de Ingreso</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">nivel</td>
+                                <td class="type-name">INT</td>
+                                <td class="restriction-text">1=User, 2=Prog, 3=Admin</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">estatus</td>
+                                <td class="type-name">INT</td>
+                                <td class="restriction-text">1=Activo, 3=Bloqueado</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">nombreyapellido</td>
+                                <td class="type-name">VARCHAR(50)</td>
+                                <td class="restriction-text">Nombre Completo</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-badge key-opt">OPT</span></td>
+                                <td class="field-name">correo</td>
+                                <td class="type-name">VARCHAR(50)</td>
+                                <td class="restriction-text">NULL (Opcional)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">ultimo_acceso</td>
+                                <td class="type-name">DATETIME</td>
+                                <td class="restriction-text">Timestamp Conexión</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">ip</td>
+                                <td class="type-name">VARCHAR(20)</td>
+                                <td class="restriction-text">Dirección IP</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">ip_fecha / ip_hora</td>
+                                <td class="type-name">DATE / TIME</td>
+                                <td class="restriction-text">Fecha/Hora Acceso</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- TABLE: suscripcion -->
+                <div class="table-card card-purple">
+                    <div class="card-header">
+                        <div class="title-box">📝 suscripcion</div>
+                        <span class="badge-tag">Clientes / Perfil</span>
+                    </div>
+                    <table class="schema-table">
+                        <thead>
+                            <tr>
+                                <th>Clave</th>
+                                <th>Campo</th>
+                                <th>Tipo de Dato</th>
+                                <th>Detalle / Restricción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="key-badge key-pk">PK</span></td>
+                                <td class="field-name">id_suscripcion</td>
+                                <td class="type-name">INT</td>
+                                <td class="restriction-text">NOT NULL, AUTO_INC</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-badge key-fk">FK</span></td>
+                                <td class="field-name">usuario</td>
+                                <td class="type-name">VARCHAR(100)</td>
+                                <td class="restriction-text">Relación a usuario_web</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-badge key-opt">OPT</span></td>
+                                <td class="field-name">correo</td>
+                                <td class="type-name">VARCHAR(100)</td>
+                                <td class="restriction-text">NULL (Opcional)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">nombre</td>
+                                <td class="type-name">VARCHAR(100)</td>
+                                <td class="restriction-text">Nombre Registrado</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">telefono / celular</td>
+                                <td class="type-name">VARCHAR(50)</td>
+                                <td class="restriction-text">Contactos Cliente</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">estatus</td>
+                                <td class="type-name">INT</td>
+                                <td class="restriction-text">0=Reg, 1=Act, 3=Bloq</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">fechahora</td>
+                                <td class="type-name">TIMESTAMP</td>
+                                <td class="restriction-text">Fecha Registro BD</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- TABLE: historial_conexiones -->
+                <div class="table-card card-green">
+                    <div class="card-header">
+                        <div class="title-box">🛡️ historial_conexiones</div>
+                        <span class="badge-tag">Auditoría / Logs</span>
+                    </div>
+                    <table class="schema-table">
+                        <thead>
+                            <tr>
+                                <th>Clave</th>
+                                <th>Campo</th>
+                                <th>Tipo de Dato</th>
+                                <th>Detalle / Restricción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="key-badge key-pk">PK</span></td>
+                                <td class="field-name">id</td>
+                                <td class="type-name">INT</td>
+                                <td class="restriction-text">NOT NULL, AUTO_INC</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-badge key-fk">FK</span></td>
+                                <td class="field-name">usuario</td>
+                                <td class="type-name">VARCHAR(100)</td>
+                                <td class="restriction-text">Relación a usuario_web</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">nombreyapellido</td>
+                                <td class="type-name">VARCHAR(100)</td>
+                                <td class="restriction-text">Nombre al conectar</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">nivel</td>
+                                <td class="type-name">INT</td>
+                                <td class="restriction-text">Nivel de Acceso (1..3)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">ip</td>
+                                <td class="type-name">VARCHAR(45)</td>
+                                <td class="restriction-text">IP Origen Conexión</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">fecha_hora</td>
+                                <td class="type-name">TIMESTAMP</td>
+                                <td class="restriction-text">Fecha y Hora Exacta</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">estado</td>
+                                <td class="type-name">VARCHAR(50)</td>
+                                <td class="restriction-text">Exitoso / Fallido</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SECTION 2: sainvc30_bd -->
+        <div id="sainvc" class="db-section hidden">
+            <div class="cards-grid">
+
+                <!-- TABLE: clientes -->
+                <div class="table-card card-blue">
+                    <div class="card-header">
+                        <div class="title-box">👤 clientes</div>
+                        <span class="badge-tag">Maestro Clientes</span>
+                    </div>
+                    <table class="schema-table">
+                        <thead>
+                            <tr>
+                                <th>Clave</th>
+                                <th>Campo</th>
+                                <th>Tipo de Dato</th>
+                                <th>Detalle / Restricción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="key-badge key-pk">PK</span></td>
+                                <td class="field-name">id_cliente</td>
+                                <td class="type-name">INT</td>
+                                <td class="restriction-text">NOT NULL, AUTO_INC</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">cliente</td>
+                                <td class="type-name">VARCHAR(50)</td>
+                                <td class="restriction-text">Nombre o Razón Social</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">rif</td>
+                                <td class="type-name">VARCHAR(20)</td>
+                                <td class="restriction-text">Doc. Identidad / RIF</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">saldo_actual</td>
+                                <td class="type-name">DECIMAL(14,2)</td>
+                                <td class="restriction-text">Saldo de Cuenta</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- TABLE: nota_venta -->
+                <div class="table-card card-amber">
+                    <div class="card-header">
+                        <div class="title-box">🧾 nota_venta</div>
+                        <span class="badge-tag">Cabecera Venta</span>
+                    </div>
+                    <table class="schema-table">
+                        <thead>
+                            <tr>
+                                <th>Clave</th>
+                                <th>Campo</th>
+                                <th>Tipo de Dato</th>
+                                <th>Detalle / Restricción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="key-badge key-pk">PK</span></td>
+                                <td class="field-name">id_nota_venta</td>
+                                <td class="type-name">INT</td>
+                                <td class="restriction-text">NOT NULL, AUTO_INC</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-badge key-fk">FK</span></td>
+                                <td class="field-name">id_cliente</td>
+                                <td class="type-name">INT</td>
+                                <td class="restriction-text">Relación a clientes</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-badge key-fk">FK</span></td>
+                                <td class="field-name">id_vendedor</td>
+                                <td class="type-name">INT</td>
+                                <td class="restriction-text">Relación a vendedores</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">correlativo</td>
+                                <td class="type-name">VARCHAR(20)</td>
+                                <td class="restriction-text">Número de Factura</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">total_neto</td>
+                                <td class="type-name">DECIMAL(14,2)</td>
+                                <td class="restriction-text">Monto Total Venta</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- TABLE: inventario -->
+                <div class="table-card card-purple">
+                    <div class="card-header">
+                        <div class="title-box">📦 inventario</div>
+                        <span class="badge-tag">Catálogo Productos</span>
+                    </div>
+                    <table class="schema-table">
+                        <thead>
+                            <tr>
+                                <th>Clave</th>
+                                <th>Campo</th>
+                                <th>Tipo de Dato</th>
+                                <th>Detalle / Restricción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="key-badge key-pk">PK</span></td>
+                                <td class="field-name">id_inventario</td>
+                                <td class="type-name">INT</td>
+                                <td class="restriction-text">NOT NULL, AUTO_INC</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">codigo</td>
+                                <td class="type-name">VARCHAR(20)</td>
+                                <td class="restriction-text">Código Producto</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">item</td>
+                                <td class="type-name">VARCHAR(100)</td>
+                                <td class="restriction-text">Descripción Producto</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">precio</td>
+                                <td class="type-name">DECIMAL(14,2)</td>
+                                <td class="restriction-text">Precio de Venta</td>
+                            </tr>
+                            <tr>
+                                <td><span class="key-none">-</span></td>
+                                <td class="field-name">existencia</td>
+                                <td class="type-name">DECIMAL(14,2)</td>
+                                <td class="restriction-text">Stock Disponible</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function switchDb(dbName, evt) {
+            document.querySelectorAll('.db-section').forEach(sec => sec.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(dbName).classList.remove('hidden');
+            evt.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

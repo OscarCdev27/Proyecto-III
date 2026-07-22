@@ -39,7 +39,7 @@ CREATE TABLE `suscripcion` (
   `cedula` varchar(15) DEFAULT NULL,
   `celular` varchar(30) DEFAULT NULL,
   `tipo` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `suscripcion`
@@ -62,7 +62,7 @@ CREATE TABLE `usuario` (
   `estatus` int(11) DEFAULT NULL,
   `nombreyapellido` varchar(50) DEFAULT NULL,
   `correo` varchar(50) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `usuario`
@@ -91,7 +91,7 @@ CREATE TABLE `usuario_web` (
   `ip_fecha` date DEFAULT NULL,
   `ip_hora` time DEFAULT NULL,
   `ultimo_acceso` datetime DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `usuario_web`
@@ -114,7 +114,7 @@ CREATE TABLE `historial_conexiones` (
   `fecha_hora` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `ip` varchar(45) DEFAULT NULL,
   `estado` varchar(50) DEFAULT 'Exitoso'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Índices para tablas volcadas

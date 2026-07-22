@@ -6,9 +6,9 @@ set -e
 echo "Iniciando la configuración de base de datos..."
 
 # Crear las bases de datos si no existen
-mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS tucasa_bd CHARACTER SET latin1 COLLATE latin1_swedish_ci;"
-mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS sainvc30_bd CHARACTER SET latin1 COLLATE latin1_swedish_ci;"
-mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS lachina2_bd CHARACTER SET latin1 COLLATE latin1_swedish_ci;"
+mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS tucasa_bd CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS sainvc30_bd CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE IF NOT EXISTS lachina2_bd CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
 echo "Bases de datos creadas exitosamente."
 
