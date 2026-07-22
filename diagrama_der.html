@@ -36,13 +36,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 2.5rem 1.5rem;
+            padding: 2rem 1rem;
         }
 
         /* HEADER */
         .header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1.8rem;
         }
 
         .header h1 {
@@ -51,8 +51,8 @@
             font-weight: 800;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            margin-bottom: 0.4rem;
-            text-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+            margin-bottom: 0.3rem;
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
         }
 
         .header p {
@@ -66,18 +66,39 @@
             background-color: var(--container-bg);
             border: 1px solid #1e293b;
             border-radius: 18px;
-            padding: 2rem;
-            max-width: 1400px;
+            padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+            max-width: 1450px;
             width: 100%;
+            position: relative;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        /* SVG OVERLAY FOR LINES */
+        #svg-connectors {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
         }
 
         /* GRID OF CARDS */
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 1.75rem;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
             align-items: start;
+            position: relative;
+            z-index: 1;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 1100px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* CARD STYLE */
@@ -87,22 +108,16 @@
             border: 1px solid var(--card-border);
             overflow: hidden;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .table-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
         }
 
         /* CARD HEADERS */
         .card-header {
-            padding: 0.9rem 1.2rem;
+            padding: 0.8rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-weight: 700;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .card-header .title-box {
@@ -112,8 +127,8 @@
         }
 
         .card-header .badge-tag {
-            font-size: 0.75rem;
-            padding: 3px 10px;
+            font-size: 0.72rem;
+            padding: 3px 9px;
             border-radius: 20px;
             font-weight: 600;
             color: #ffffff;
@@ -141,49 +156,58 @@
         .schema-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
+            table-layout: fixed;
         }
 
         .schema-table th {
             background-color: #0f172a;
             color: var(--text-muted);
             text-align: left;
-            padding: 0.6rem 0.9rem;
+            padding: 0.55rem 0.75rem;
             font-weight: 600;
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             border-bottom: 1px solid #334155;
         }
 
+        .schema-table col.col-key { width: 55px; }
+        .schema-table col.col-name { width: 125px; }
+        .schema-table col.col-type { width: 100px; }
+        .schema-table col.col-desc { width: auto; }
+
         .schema-table td {
-            padding: 0.65rem 0.9rem;
+            padding: 0.6rem 0.75rem;
             border-bottom: 1px solid #1e293b;
             color: #cbd5e1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .schema-table tr:last-child td {
             border-bottom: none;
         }
 
-        .schema-table tr:hover td {
-            background-color: rgba(255, 255, 255, 0.03);
+        .schema-table tr.highlighted td {
+            background-color: rgba(56, 189, 248, 0.12);
         }
 
         /* BADGES FOR KEYS */
         .key-badge {
             display: inline-block;
             font-weight: 800;
-            font-size: 0.72rem;
-            padding: 2px 6px;
+            font-size: 0.7rem;
+            padding: 2px 5px;
             border-radius: 4px;
             color: #ffffff;
             text-align: center;
             min-width: 32px;
         }
 
-        .key-pk { background-color: var(--badge-pk); }
-        .key-fk { background-color: var(--badge-fk); }
+        .key-pk { background-color: var(--badge-pk); box-shadow: 0 0 8px rgba(249, 115, 22, 0.4); }
+        .key-fk { background-color: var(--badge-fk); box-shadow: 0 0 8px rgba(59, 130, 246, 0.4); }
         .key-index { background-color: var(--badge-index); }
         .key-opt { background-color: var(--badge-opt); }
         .key-none { color: #64748b; font-weight: 400; }
@@ -196,19 +220,19 @@
         .type-name {
             color: #38bdf8;
             font-family: monospace;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
         }
 
         .restriction-text {
             color: var(--text-muted);
-            font-size: 0.8rem;
+            font-size: 0.78rem;
         }
 
         /* TAB NAVIGATION */
         .tab-nav {
             display: flex;
             gap: 12px;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
         }
 
         .tab-btn {
@@ -235,16 +259,54 @@
         .db-section.hidden {
             display: none;
         }
+
+        /* LEGEND */
+        .legend-bar {
+            display: flex;
+            gap: 20px;
+            margin-top: 1.8rem;
+            padding-top: 1rem;
+            border-top: 1px solid #1e293b;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h1>DIAGRAMA ENTIDAD-RELACIÓN (DER)</h1>
-        <p>Modelo de Datos Físico - Base de Datos lachina2_bd (Sistema Centro de Apuestas)</p>
+        <p>Modelo de Datos Físico - Centro de Apuestas "La China Sports"</p>
     </div>
 
-    <div class="diagram-container">
+    <div class="diagram-container" id="diagram-container">
+
+        <!-- SVG CONNECTORS -->
+        <svg id="svg-connectors">
+            <defs>
+                <marker id="marker-dot-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+                    <circle cx="5" cy="5" r="4" fill="#06b6d4"/>
+                </marker>
+                <marker id="marker-arrow-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#06b6d4"/>
+                </marker>
+
+                <marker id="marker-dot-green" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+                    <circle cx="5" cy="5" r="4" fill="#10b981"/>
+                </marker>
+                <marker id="marker-arrow-green" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981"/>
+                </marker>
+            </defs>
+        </svg>
 
         <div class="tab-nav">
             <button class="tab-btn active" onclick="switchDb('lachina2', event)">Base de Datos: lachina2_bd</button>
@@ -262,6 +324,12 @@
                         <span class="badge-tag">Tabla Principal</span>
                     </div>
                     <table class="schema-table">
+                        <colgroup>
+                            <col class="col-key">
+                            <col class="col-name">
+                            <col class="col-type">
+                            <col class="col-desc">
+                        </colgroup>
                         <thead>
                             <tr>
                                 <th>Clave</th>
@@ -271,17 +339,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            <tr id="row-usuario_web-id">
                                 <td><span class="key-badge key-pk">PK</span></td>
                                 <td class="field-name">id_usuario</td>
                                 <td class="type-name">INT</td>
                                 <td class="restriction-text">NOT NULL, AUTO_INC</td>
                             </tr>
-                            <tr>
+                            <tr id="row-usuario_web-usuario" class="highlighted">
                                 <td><span class="key-badge key-index">INDEX</span></td>
                                 <td class="field-name">usuario</td>
                                 <td class="type-name">VARCHAR(50)</td>
-                                <td class="restriction-text">Unique Username</td>
+                                <td class="restriction-text">Unique Username 🔑</td>
                             </tr>
                             <tr>
                                 <td><span class="key-none">-</span></td>
@@ -342,6 +410,12 @@
                         <span class="badge-tag">Clientes / Perfil</span>
                     </div>
                     <table class="schema-table">
+                        <colgroup>
+                            <col class="col-key">
+                            <col class="col-name">
+                            <col class="col-type">
+                            <col class="col-desc">
+                        </colgroup>
                         <thead>
                             <tr>
                                 <th>Clave</th>
@@ -351,17 +425,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            <tr id="row-suscripcion-id">
                                 <td><span class="key-badge key-pk">PK</span></td>
                                 <td class="field-name">id_suscripcion</td>
                                 <td class="type-name">INT</td>
                                 <td class="restriction-text">NOT NULL, AUTO_INC</td>
                             </tr>
-                            <tr>
+                            <tr id="row-suscripcion-usuario" class="highlighted">
                                 <td><span class="key-badge key-fk">FK</span></td>
                                 <td class="field-name">usuario</td>
                                 <td class="type-name">VARCHAR(100)</td>
-                                <td class="restriction-text">Relación a usuario_web</td>
+                                <td class="restriction-text">Relación usuario_web</td>
                             </tr>
                             <tr>
                                 <td><span class="key-badge key-opt">OPT</span></td>
@@ -404,6 +478,12 @@
                         <span class="badge-tag">Auditoría / Logs</span>
                     </div>
                     <table class="schema-table">
+                        <colgroup>
+                            <col class="col-key">
+                            <col class="col-name">
+                            <col class="col-type">
+                            <col class="col-desc">
+                        </colgroup>
                         <thead>
                             <tr>
                                 <th>Clave</th>
@@ -413,17 +493,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            <tr id="row-historial-id">
                                 <td><span class="key-badge key-pk">PK</span></td>
                                 <td class="field-name">id</td>
                                 <td class="type-name">INT</td>
                                 <td class="restriction-text">NOT NULL, AUTO_INC</td>
                             </tr>
-                            <tr>
+                            <tr id="row-historial-usuario" class="highlighted">
                                 <td><span class="key-badge key-fk">FK</span></td>
                                 <td class="field-name">usuario</td>
                                 <td class="type-name">VARCHAR(100)</td>
-                                <td class="restriction-text">Relación a usuario_web</td>
+                                <td class="restriction-text">Relación usuario_web</td>
                             </tr>
                             <tr>
                                 <td><span class="key-none">-</span></td>
@@ -473,6 +553,12 @@
                         <span class="badge-tag">Maestro Clientes</span>
                     </div>
                     <table class="schema-table">
+                        <colgroup>
+                            <col class="col-key">
+                            <col class="col-name">
+                            <col class="col-type">
+                            <col class="col-desc">
+                        </colgroup>
                         <thead>
                             <tr>
                                 <th>Clave</th>
@@ -482,11 +568,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            <tr id="row-clientes-id" class="highlighted">
                                 <td><span class="key-badge key-pk">PK</span></td>
                                 <td class="field-name">id_cliente</td>
                                 <td class="type-name">INT</td>
-                                <td class="restriction-text">NOT NULL, AUTO_INC</td>
+                                <td class="restriction-text">NOT NULL, AUTO_INC 🔑</td>
                             </tr>
                             <tr>
                                 <td><span class="key-none">-</span></td>
@@ -517,6 +603,12 @@
                         <span class="badge-tag">Cabecera Venta</span>
                     </div>
                     <table class="schema-table">
+                        <colgroup>
+                            <col class="col-key">
+                            <col class="col-name">
+                            <col class="col-type">
+                            <col class="col-desc">
+                        </colgroup>
                         <thead>
                             <tr>
                                 <th>Clave</th>
@@ -526,23 +618,23 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            <tr id="row-notaventa-id" class="highlighted">
                                 <td><span class="key-badge key-pk">PK</span></td>
                                 <td class="field-name">id_nota_venta</td>
                                 <td class="type-name">INT</td>
-                                <td class="restriction-text">NOT NULL, AUTO_INC</td>
+                                <td class="restriction-text">NOT NULL, AUTO_INC 🔑</td>
                             </tr>
-                            <tr>
+                            <tr id="row-notaventa-idcliente" class="highlighted">
                                 <td><span class="key-badge key-fk">FK</span></td>
                                 <td class="field-name">id_cliente</td>
                                 <td class="type-name">INT</td>
-                                <td class="restriction-text">Relación a clientes</td>
+                                <td class="restriction-text">Relación clientes</td>
                             </tr>
                             <tr>
                                 <td><span class="key-badge key-fk">FK</span></td>
                                 <td class="field-name">id_vendedor</td>
                                 <td class="type-name">INT</td>
-                                <td class="restriction-text">Relación a vendedores</td>
+                                <td class="restriction-text">Relación vendedores</td>
                             </tr>
                             <tr>
                                 <td><span class="key-none">-</span></td>
@@ -560,13 +652,19 @@
                     </table>
                 </div>
 
-                <!-- TABLE: inventario -->
+                <!-- TABLE: nota_venta_detalle -->
                 <div class="table-card card-purple">
                     <div class="card-header">
-                        <div class="title-box">📦 inventario</div>
-                        <span class="badge-tag">Catálogo Productos</span>
+                        <div class="title-box">📦 nota_venta_detalle</div>
+                        <span class="badge-tag">Detalle de Ítems</span>
                     </div>
                     <table class="schema-table">
+                        <colgroup>
+                            <col class="col-key">
+                            <col class="col-name">
+                            <col class="col-type">
+                            <col class="col-desc">
+                        </colgroup>
                         <thead>
                             <tr>
                                 <th>Clave</th>
@@ -578,33 +676,33 @@
                         <tbody>
                             <tr>
                                 <td><span class="key-badge key-pk">PK</span></td>
-                                <td class="field-name">id_inventario</td>
+                                <td class="field-name">id_nota_venta_detalle</td>
                                 <td class="type-name">INT</td>
                                 <td class="restriction-text">NOT NULL, AUTO_INC</td>
                             </tr>
+                            <tr id="row-notadetalle-idventa" class="highlighted">
+                                <td><span class="key-badge key-fk">FK</span></td>
+                                <td class="field-name">id_nota_venta</td>
+                                <td class="type-name">INT</td>
+                                <td class="restriction-text">Relación nota_venta</td>
+                            </tr>
                             <tr>
-                                <td><span class="key-none">-</span></td>
-                                <td class="field-name">codigo</td>
-                                <td class="type-name">VARCHAR(20)</td>
-                                <td class="restriction-text">Código Producto</td>
+                                <td><span class="key-badge key-fk">FK</span></td>
+                                <td class="field-name">id_inventario</td>
+                                <td class="type-name">INT</td>
+                                <td class="restriction-text">Relación inventario</td>
                             </tr>
                             <tr>
                                 <td><span class="key-none">-</span></td>
-                                <td class="field-name">item</td>
-                                <td class="type-name">VARCHAR(100)</td>
-                                <td class="restriction-text">Descripción Producto</td>
+                                <td class="field-name">cantidad</td>
+                                <td class="type-name">DECIMAL(14,2)</td>
+                                <td class="restriction-text">Cantidad Vendida</td>
                             </tr>
                             <tr>
                                 <td><span class="key-none">-</span></td>
                                 <td class="field-name">precio</td>
                                 <td class="type-name">DECIMAL(14,2)</td>
-                                <td class="restriction-text">Precio de Venta</td>
-                            </tr>
-                            <tr>
-                                <td><span class="key-none">-</span></td>
-                                <td class="field-name">existencia</td>
-                                <td class="type-name">DECIMAL(14,2)</td>
-                                <td class="restriction-text">Stock Disponible</td>
+                                <td class="restriction-text">Precio Unitario</td>
                             </tr>
                         </tbody>
                     </table>
@@ -613,16 +711,136 @@
             </div>
         </div>
 
+        <div class="legend-bar">
+            <div class="legend-item"><span class="key-badge key-pk">PK</span> Llave Primaria</div>
+            <div class="legend-item"><span class="key-badge key-fk">FK</span> Llave Foránea</div>
+            <div class="legend-item"><span class="key-badge key-index">INDEX</span> Índice Único</div>
+            <div class="legend-item"><span style="color: #38bdf8; font-weight: bold;">─── (1:N)</span> Línea de Relación Relacional</div>
+        </div>
+
     </div>
 
     <script>
+        function drawConnectors() {
+            const svg = document.getElementById('svg-connectors');
+            const container = document.getElementById('diagram-container');
+            const containerRect = container.getBoundingClientRect();
+            
+            // Clear SVG content
+            svg.innerHTML = `
+                <defs>
+                    <marker id="marker-dot-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+                        <circle cx="5" cy="5" r="4" fill="#06b6d4"/>
+                    </marker>
+                    <marker id="marker-arrow-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#06b6d4"/>
+                    </marker>
+                    <marker id="marker-dot-green" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+                        <circle cx="5" cy="5" r="4" fill="#10b981"/>
+                    </marker>
+                    <marker id="marker-arrow-green" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981"/>
+                    </marker>
+                </defs>
+            `;
+
+            const currentDb = document.querySelector('.db-section:not(.hidden)').id;
+
+            let connections = [];
+            if (currentDb === 'lachina2') {
+                connections = [
+                    { from: 'row-usuario_web-usuario', to: 'row-suscripcion-usuario', color: '#06b6d4', markerDot: 'marker-dot-blue', markerArrow: 'marker-arrow-blue', label: '1 : N', arcTop: false },
+                    { from: 'row-usuario_web-usuario', to: 'row-historial-usuario', color: '#10b981', markerDot: 'marker-dot-green', markerArrow: 'marker-arrow-green', label: '1 : N', arcTop: true }
+                ];
+            } else if (currentDb === 'sainvc') {
+                connections = [
+                    { from: 'row-clientes-id', to: 'row-notaventa-idcliente', color: '#38bdf8', markerDot: 'marker-dot-blue', markerArrow: 'marker-arrow-blue', label: '1 : N', arcTop: false },
+                    { from: 'row-notaventa-id', to: 'row-notadetalle-idventa', color: '#f59e0b', markerDot: 'marker-dot-blue', markerArrow: 'marker-arrow-blue', label: '1 : N', arcTop: false }
+                ];
+            }
+
+            connections.forEach(conn => {
+                const elFrom = document.getElementById(conn.from);
+                const elTo = document.getElementById(conn.to);
+
+                if (elFrom && elTo) {
+                    const rectFrom = elFrom.getBoundingClientRect();
+                    const rectTo = elTo.getBoundingClientRect();
+
+                    const x1 = rectFrom.right - containerRect.left;
+                    const y1 = rectFrom.top + rectFrom.height / 2 - containerRect.top;
+
+                    const x2 = rectTo.left - containerRect.left;
+                    const y2 = rectTo.top + rectTo.height / 2 - containerRect.top;
+
+                    let pathData = '';
+                    let labelX = (x1 + x2) / 2;
+                    let labelY = (y1 + y2) / 2;
+
+                    if (conn.arcTop) {
+                        // Arc high over the cards to avoid crossing middle card!
+                        const arcY = Math.min(y1, y2) - 55;
+                        pathData = `M ${x1} ${y1} C ${x1 + 40} ${arcY}, ${x2 - 40} ${arcY}, ${x2} ${y2}`;
+                        labelY = arcY + 12;
+                    } else {
+                        // Smooth direct curve
+                        const dx = Math.abs(x2 - x1) * 0.45;
+                        pathData = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+                        labelY = (y1 + y2) / 2 - 12;
+                    }
+
+                    // Create Path Line
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('d', pathData);
+                    path.setAttribute('stroke', conn.color);
+                    path.setAttribute('stroke-width', '3');
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('marker-start', `url(#${conn.markerDot})`);
+                    path.setAttribute('marker-end', `url(#${conn.markerArrow})`);
+                    path.setAttribute('filter', 'drop-shadow(0 0 6px ' + conn.color + ')');
+                    svg.appendChild(path);
+
+                    // Create Badge Background Rect for Label
+                    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    
+                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    rect.setAttribute('x', labelX - 22);
+                    rect.setAttribute('y', labelY - 12);
+                    rect.setAttribute('width', '44');
+                    rect.setAttribute('height', '18');
+                    rect.setAttribute('rx', '4');
+                    rect.setAttribute('fill', '#0f172a');
+                    rect.setAttribute('stroke', conn.color);
+                    rect.setAttribute('stroke-width', '1.5');
+
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', labelX);
+                    text.setAttribute('y', labelY + 1);
+                    text.setAttribute('fill', '#ffffff');
+                    text.setAttribute('font-size', '11');
+                    text.setAttribute('font-weight', 'bold');
+                    text.setAttribute('text-anchor', 'middle');
+                    text.textContent = conn.label;
+
+                    g.appendChild(rect);
+                    g.appendChild(text);
+                    svg.appendChild(g);
+                }
+            });
+        }
+
         function switchDb(dbName, evt) {
             document.querySelectorAll('.db-section').forEach(sec => sec.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             
             document.getElementById(dbName).classList.remove('hidden');
             evt.target.classList.add('active');
+
+            setTimeout(drawConnectors, 50);
         }
+
+        window.addEventListener('load', drawConnectors);
+        window.addEventListener('resize', drawConnectors);
     </script>
 </body>
 </html>

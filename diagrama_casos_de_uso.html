@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama de Casos de Uso (UML) - La China Sports</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --container-bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --title-gold: #f59e0b;
+
+            --role-user: #0284c7;
+            --role-dev: #9333ea;
+            --role-admin: #d97706;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+            margin-bottom: 1.8rem;
+        }
+
+        .header h1 {
+            color: var(--title-gold);
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            font-weight: 500;
+        }
+
+        /* MAIN CONTAINER */
+        .usecase-container {
+            background-color: var(--container-bg);
+            border: 1px solid #1e293b;
+            border-radius: 18px;
+            padding: 2rem;
+            max-width: 1500px;
+            width: 100%;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        /* SVG CONNECTORS OVERLAY */
+        #svg-connectors {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* SYSTEM BOUNDARY BOX */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ACTORS COLUMN (LEFT) */
+        .actors-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .actor-card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 14px;
+            padding: 1.25rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .actor-card:hover, .actor-card.active {
+            transform: translateY(-3px);
+        }
+
+        .actor-card.user-card.active, .actor-card.user-card:hover {
+            border-color: var(--role-user);
+            box-shadow: 0 0 20px rgba(2, 132, 199, 0.4);
+        }
+
+        .actor-card.dev-card.active, .actor-card.dev-card:hover {
+            border-color: var(--role-dev);
+            box-shadow: 0 0 20px rgba(147, 51, 234, 0.4);
+        }
+
+        .actor-card.admin-card.active, .actor-card.admin-card:hover {
+            border-color: var(--role-admin);
+            box-shadow: 0 0 20px rgba(217, 119, 6, 0.4);
+        }
+
+        .actor-icon {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .actor-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 0.3rem;
+        }
+
+        .actor-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 15px;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge-user { background-color: var(--role-user); }
+        .badge-dev { background-color: var(--role-dev); }
+        .badge-admin { background-color: var(--role-admin); }
+
+        .actor-desc {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.35;
+        }
+
+        /* SYSTEM BOUNDARY CONTAINER (RIGHT) */
+        .system-boundary {
+            border: 2px dashed #334155;
+            border-radius: 16px;
+            padding: 1.5rem;
+            background-color: rgba(15, 23, 42, 0.6);
+            position: relative;
+        }
+
+        .system-title {
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 1.2rem;
+            text-align: center;
+        }
+
+        /* USE CASES GRID */
+        .usecase-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.2rem;
+        }
+
+        @media (max-width: 1200px) {
+            .usecase-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* USE CASE PILL CARD */
+        .uc-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 30px;
+            padding: 0.9rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.2s ease;
+            position: relative;
+            opacity: 0.55;
+        }
+
+        .uc-card.highlighted {
+            opacity: 1;
+            border-color: #38bdf8;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+            transform: scale(1.02);
+        }
+
+        .uc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.3rem;
+        }
+
+        .uc-tag {
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: #ffffff;
+        }
+
+        .uc-tag-user { background-color: var(--role-user); }
+        .uc-tag-dev { background-color: var(--role-dev); }
+        .uc-tag-admin { background-color: var(--role-admin); }
+
+        .uc-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.2rem;
+        }
+
+        .uc-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* CONTROLS BAR */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-btn {
+            background-color: #1e293b;
+            color: var(--text-muted);
+            border: 1px solid #334155;
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background-color: var(--title-gold);
+            color: #000000;
+            border-color: var(--title-gold);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>DIAGRAMA DE CASOS DE USO (UML)</h1>
+        <p>Sistema Web La China Sports (lachina2_bd) - Mapa de Funcionalidades por Rol</p>
+    </div>
+
+    <div class="usecase-container" id="usecase-container">
+
+        <!-- SVG OVERLAY FOR LINES -->
+        <svg id="svg-connectors">
+            <defs>
+                <marker id="arrow-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#0284c7"/>
+                </marker>
+                <marker id="arrow-purple" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#9333ea"/>
+                </marker>
+                <marker id="arrow-admin" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#d97706"/>
+                </marker>
+            </defs>
+        </svg>
+
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="selectRole('all', this)">⚡ Ver Todos los Conectores</button>
+            <button class="filter-btn" onclick="selectRole('user', this)">👤 Solo Usuario Regular</button>
+            <button class="filter-btn" onclick="selectRole('dev', this)">💻 Solo Programador</button>
+            <button class="filter-btn" onclick="selectRole('admin', this)">👑 Solo Administrador</button>
+        </div>
+
+        <div class="layout-grid">
+
+            <!-- ACTORS COLUMN -->
+            <div class="actors-column">
+
+                <!-- ACTOR 1 -->
+                <div class="actor-card user-card active" id="actor-user" onclick="selectRole('user')">
+                    <div class="actor-icon">👤</div>
+                    <div class="actor-title">Usuario Regular</div>
+                    <span class="actor-badge badge-user">Nivel 1 (Cliente)</span>
+                    <p class="actor-desc">Acceso centrado en ver resultados e información personal.</p>
+                </div>
+
+                <!-- ACTOR 2 -->
+                <div class="actor-card dev-card active" id="actor-dev" onclick="selectRole('dev')">
+                    <div class="actor-icon">💻</div>
+                    <div class="actor-title">Programador</div>
+                    <span class="actor-badge badge-dev">Nivel 2 (Dev)</span>
+                    <p class="actor-desc">Gestión de clientes y monitoreo técnico de servidor y DB.</p>
+                </div>
+
+                <!-- ACTOR 3 -->
+                <div class="actor-card admin-card active" id="actor-admin" onclick="selectRole('admin')">
+                    <div class="actor-icon">👑</div>
+                    <div class="actor-title">Administrador</div>
+                    <span class="actor-badge badge-admin">Nivel 3 (Admin)</span>
+                    <p class="actor-desc">Control total, gestión de roles y simulación de vistas.</p>
+                </div>
+
+            </div>
+
+            <!-- SYSTEM BOUNDARY & USE CASES -->
+            <div class="system-boundary">
+                <div class="system-title">SISTEMA WEB LA CHINA SPORTS (LACHINA2_BD)</div>
+
+                <div class="usecase-grid">
+
+                    <!-- UC-01 -->
+                    <div class="uc-card highlighted" id="uc-01" data-roles="user,admin">
+                        <div class="uc-header">
+                            <span class="uc-tag uc-tag-user">UC-01</span>
+                        </div>
+                        <div class="uc-title">Registrarse en el Sistema</div>
+                        <div class="uc-sub">(Username + Correo Opcional)</div>
+                    </div>
+
+                    <!-- UC-02 -->
+                    <div class="uc-card highlighted" id="uc-02" data-roles="user,dev,admin">
+                        <div class="uc-header">
+                            <span class="uc-tag uc-tag-user">UC-02</span>
+                        </div>
+                        <div class="uc-title">Iniciar Sesión</div>
+                        <div class="uc-sub">(Username o Correo + Clave)</div>
+                    </div>
+
+                    <!-- UC-03 -->
+                    <div class="uc-card highlighted" id="uc-03" data-roles="user,dev,admin">
+                        <div class="uc-header">
+                            <span class="uc-tag uc-tag-user">UC-03</span>
+                        </div>
+                        <div class="uc-title">Consultar Resultados SportBook</div>
+                        <div class="uc-sub">(MLB, NFL, NHL, Basket, Fútbol)</div>
+                    </div>
+
+                    <!-- UC-04 -->
+                    <div class="uc-card highlighted" id="uc-04" data-roles="user,dev,admin">
+                        <div class="uc-header">
+                            <span class="uc-tag uc-tag-user">UC-04</span>
+                        </div>
+                        <div class="uc-title">Ver Historial de Seguridad Propio</div>
+                        <div class="uc-sub">(Conexiones de su cuenta)</div>
+                    </div>
+
+                    <!-- UC-05 -->
+                    <div class="uc-card highlighted" id="uc-05" data-roles="dev,admin">
+                        <div class="uc-header">
+                            <span class="uc-tag uc-tag-dev">UC-05</span>
+                        </div>
+                        <div class="uc-title">Monitorear Servidor y DB</div>
+                        <div class="uc-sub">(Estructura y Motores de Tablas)</div>
+                    </div>
+
+                    <!-- UC-06 -->
+                    <div class="uc-card highlighted" id="uc-06" data-roles="dev,admin">
+                        <div class="uc-header">
+                            <span class="uc-tag uc-tag-dev">UC-06</span>
+                        </div>
+                        <div class="uc-title">Ver Consola de Logs Generales</div>
+                        <div class="uc-sub">(Auditoría general de accesos)</div>
+                    </div>
+
+                    <!-- UC-07 -->
+                    <div class="uc-card highlighted" id="uc-07" data-roles="dev,admin">
+                        <div class="uc-header">
+                            <span class="uc-tag uc-tag-dev">UC-07</span>
+                        </div>
+                        <div class="uc-title">Modificar Datos de Usuario Regular</div>
+                        <div class="uc-sub">(Username, Clave, Correo, Nombre)</div>
+                    </div>
+
+                    <!-- UC-08 -->
+                    <div class="uc-card highlighted" id="uc-08" data-roles="dev,admin">
+                        <div class="uc-header">
+                            <span class="uc-tag uc-tag-dev">UC-08</span>
+                        </div>
+                        <div class="uc-title">Bloquear / Activar Usuario</div>
+                        <div class="uc-sub">(Cambio de estatus 1 u 3 - Rol Fijo)</div>
+                    </div>
+
+                    <!-- UC-09 -->
+                    <div class="uc-card highlighted" id="uc-09" data-roles="admin">
+                        <div class="uc-header">
+                            <span class="uc-tag uc-tag-admin">UC-09</span>
+                        </div>
+                        <div class="uc-title">Simular y Auditar Vistas</div>
+                        <div class="uc-sub">(view_as: Usuario, Prog, Admin)</div>
+                    </div>
+
+                    <!-- UC-10 -->
+                    <div class="uc-card highlighted" id="uc-10" data-roles="admin">
+                        <div class="uc-header">
+                            <span class="uc-tag uc-tag-admin">UC-10</span>
+                        </div>
+                        <div class="uc-title">Registrar Nuevos Usuarios</div>
+                        <div class="uc-sub">(Cualquier nivel de acceso)</div>
+                    </div>
+
+                    <!-- UC-11 -->
+                    <div class="uc-card highlighted" id="uc-11" data-roles="admin">
+                        <div class="uc-header">
+                            <span class="uc-tag uc-tag-admin">UC-11</span>
+                        </div>
+                        <div class="uc-title">Editar Usuarios y Cambiar Roles</div>
+                        <div class="uc-sub">(Asignar Niveles 1, 2 o 3)</div>
+                    </div>
+
+                    <!-- UC-12 -->
+                    <div class="uc-card highlighted" id="uc-12" data-roles="admin">
+                        <div class="uc-header">
+                            <span class="uc-tag uc-tag-admin">UC-12</span>
+                        </div>
+                        <div class="uc-title">Eliminar Usuarios del Sistema</div>
+                        <div class="uc-sub">(Eliminación total en BD)</div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        let currentFilter = 'all';
+
+        const actorConnections = {
+            user: { color: '#0284c7', marker: 'arrow-blue', ucs: ['uc-01', 'uc-02', 'uc-03', 'uc-04'] },
+            dev: { color: '#9333ea', marker: 'arrow-purple', ucs: ['uc-02', 'uc-03', 'uc-05', 'uc-06', 'uc-07', 'uc-08'] },
+            admin: { color: '#d97706', marker: 'arrow-admin', ucs: ['uc-01', 'uc-02', 'uc-03', 'uc-04', 'uc-05', 'uc-06', 'uc-07', 'uc-08', 'uc-09', 'uc-10', 'uc-11', 'uc-12'] }
+        };
+
+        function drawConnectors() {
+            const svg = document.getElementById('svg-connectors');
+            const container = document.getElementById('usecase-container');
+            const containerRect = container.getBoundingClientRect();
+
+            svg.innerHTML = `
+                <defs>
+                    <marker id="arrow-blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#0284c7"/>
+                    </marker>
+                    <marker id="arrow-purple" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#9333ea"/>
+                    </marker>
+                    <marker id="arrow-admin" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#d97706"/>
+                    </marker>
+                </defs>
+            `;
+
+            const rolesToDraw = currentFilter === 'all' ? ['user', 'dev', 'admin'] : [currentFilter];
+
+            rolesToDraw.forEach(roleKey => {
+                const config = actorConnections[roleKey];
+                const elActor = document.getElementById('actor-' + roleKey);
+
+                if (!elActor) return;
+                const rectActor = elActor.getBoundingClientRect();
+                const x1 = rectActor.right - containerRect.left;
+                const y1 = rectActor.top + rectActor.height / 2 - containerRect.top;
+
+                config.ucs.forEach(ucId => {
+                    const elUc = document.getElementById(ucId);
+                    if (!elUc) return;
+
+                    const rectUc = elUc.getBoundingClientRect();
+                    const x2 = rectUc.left - containerRect.left;
+                    const y2 = rectUc.top + rectUc.height / 2 - containerRect.top;
+
+                    const dx = Math.abs(x2 - x1) * 0.45;
+                    const pathData = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('d', pathData);
+                    path.setAttribute('stroke', config.color);
+                    path.setAttribute('stroke-width', currentFilter === 'all' ? '2' : '3');
+                    path.setAttribute('stroke-opacity', currentFilter === 'all' ? '0.75' : '1');
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('marker-end', `url(#${config.marker})`);
+                    path.setAttribute('filter', 'drop-shadow(0 0 4px ' + config.color + ')');
+                    svg.appendChild(path);
+                });
+            });
+        }
+
+        function selectRole(roleKey, btnEl) {
+            currentFilter = roleKey;
+
+            // Update Filter Buttons
+            if (btnEl) {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btnEl.classList.add('active');
+            }
+
+            // Highlight Cards
+            document.querySelectorAll('.uc-card').forEach(card => {
+                const cardRoles = card.getAttribute('data-roles').split(',');
+                if (currentFilter === 'all' || cardRoles.includes(currentFilter)) {
+                    card.classList.add('highlighted');
+                } else {
+                    card.classList.remove('highlighted');
+                }
+            });
+
+            // Highlight Actor Cards
+            document.querySelectorAll('.actor-card').forEach(card => {
+                if (currentFilter === 'all' || card.id === 'actor-' + currentFilter) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            });
+
+            drawConnectors();
+        }
+
+        window.addEventListener('load', drawConnectors);
+        window.addEventListener('resize', drawConnectors);
+    </script>
+</body>
+</html>
